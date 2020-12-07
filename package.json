@@ -1,0 +1,25 @@
+{
+  "name": "nibzbstx",
+  "version": "1.0.0",
+  "description": "Simple and reusable state management system with side effects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zblash/nibzbstx.git"
+  },
+  "keywords": [
+    "state-management"
+  ],
+  "author": "Yusuf Can 'zblash' Celik",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zblash/nibzbstx/issues"
+  },
+  "homepage": "https://github.com/zblash/nibzbstx#readme",
+  "devDependencies": {
+    "eslint": "^7.15.0"
+  }
+}
