@@ -1,7 +1,5 @@
 /* eslint no-console:0 */
-
-import { getActionHOC } from "./actions";
-
+import { difference } from "./utils";
 const noFunc = () => {
   console.log(
     "There is no forward function instance! Before using the forward function you have to create a store"
@@ -18,20 +16,26 @@ function applyForward(forward) {
   resForward = forward;
 }
 
-export function store(initialState, reducers) {
-  const actions = getActionHOC.getInstance().Actions;
+export function store(initialState, forwards, generatedActions) {
+  const actions = generatedActions;
   let state = initialState;
   let subCount = 0;
-  const reducerArr = reducers;
+  const forwardArr = forwards;
   const subs = [];
+  // {callbackFunc, depActionArr}
+  const effects = [];
   applyForward(stateForward);
   // {comp: Component, args: args[], stateFunc: Function, forwardFunc: Function }
   const comps = [];
   function stateForward(action) {
-    reducerArr.forEach((reducer) => {
+    const oldState = state;
+    forwardArr.forEach((reducer) => {
       state = Object.assign({}, reducer(state, action));
     });
-    sendNewStateToSubs();
+    if (difference(state, oldState) !== null) {
+      produceEffect(difference(state, oldState));
+      sendNewStateToSubs();
+    }
   }
 
   function getState() {
@@ -51,7 +55,17 @@ export function store(initialState, reducers) {
       subs.splice(subCount, 1);
     };
   }
-
+  function produceEffect(dependency) {
+    const changes = Object.keys(dependency);
+    effects.forEach((effect) => {
+      if (effect.depActionArr.some((r) => changes.indexOf(r) > -1)) {
+        effect.callbackFunc();
+      }
+    });
+  }
+  function manageEffects(callback, depActionArr) {
+    effects.push({ callbackFunc: callback, depActionArr: depActionArr });
+  }
   function subscribeComponent(component, args, stateFunc, forwardFunc) {
     // {comp: Component, args: args[], stateFunc: Function, forwardFunc: Function }
     comps.push({
@@ -88,5 +102,5 @@ export function store(initialState, reducers) {
       return component(...args, stateFunc(state), forwardFunc(stateForward));
     };
   }
-  return { connect, useSelection, getState, subscribe, actions };
+  return { connect, useSelection, getState, subscribe, actions, manageEffects };
 }

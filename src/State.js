@@ -1,8 +1,8 @@
-import { getActionHOC } from "./actions";
+import { ActionHOC } from "./actions";
 import { forward } from "./store";
 
 export function State(args) {
-  const actionHoc = getActionHOC.getInstance();
+  const actionHoc = ActionHOC();
   const actions = args;
   const initialState = actions.initial;
   delete actions.initial;
@@ -44,11 +44,10 @@ export function State(args) {
       return forward(action);
     };
 
-    reducerWithActions.forwardFuncs[actionName] = actionMethod;
     reducerWithActions[actionName] = actionMethod;
 
     actionHoc.addAction(actionName, actionMethod, actionCreator);
   });
-
+  reducerWithActions.actions = actionHoc;
   return reducerWithActions;
 }

@@ -1,4 +1,4 @@
-function ActionHOC() {
+export function ActionHOC() {
   const Actions = {};
   const ActionCreators = {};
   function addAction(actionName, action, actionCreator) {
@@ -14,20 +14,3 @@ function ActionHOC() {
 
   return { ActionCreators, Actions, addAction };
 }
-
-export const getActionHOC = (function () {
-  let instance;
-
-  function create() {
-    return ActionHOC();
-  }
-
-  return {
-    getInstance: function () {
-      if (!instance) {
-        instance = create();
-      }
-      return instance;
-    },
-  };
-})();
