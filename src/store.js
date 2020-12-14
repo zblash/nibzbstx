@@ -1,5 +1,6 @@
 /* eslint no-console:0 */
 import { difference } from "./utils";
+import _ from "lodash";
 const noFunc = () => {
   console.log(
     "There is no forward function instance! Before using the forward function you have to create a store"
@@ -18,21 +19,34 @@ function applyForward(forward) {
 
 export function store(initialState, forwards, generatedActions) {
   const actions = generatedActions;
+
   let state = initialState;
+
   let subCount = 0;
+
   const forwardArr = forwards;
+
   const subs = [];
+
   // {callbackFunc, depActionArr}
   const effects = [];
+
   applyForward(stateForward);
+
   // {comp: Component, args: args[], stateFunc: Function, forwardFunc: Function }
   const comps = [];
+
   function stateForward(action) {
     const oldState = state;
     forwardArr.forEach((reducer) => {
-      state = Object.assign({}, reducer(state, action));
+      const returnedState = reducer(state, action);
+      if (_.isPlainObject(returnedState)) {
+        state = Object.assign({}, returnedState);
+      } else {
+        throw new Error("You can only set the state with plain object");
+      }
     });
-    if (difference(state, oldState) !== null) {
+    if (!_.isEqual(state, oldState)) {
       produceEffect(difference(state, oldState));
       sendNewStateToSubs();
     }
@@ -55,6 +69,7 @@ export function store(initialState, forwards, generatedActions) {
       subs.splice(subCount, 1);
     };
   }
+
   function produceEffect(dependency) {
     const changes = Object.keys(dependency);
     effects.forEach((effect) => {
@@ -63,9 +78,11 @@ export function store(initialState, forwards, generatedActions) {
       }
     });
   }
+
   function manageEffects(callback, depActionArr) {
     effects.push({ callbackFunc: callback, depActionArr: depActionArr });
   }
+
   function subscribeComponent(component, args, stateFunc, forwardFunc) {
     // {comp: Component, args: args[], stateFunc: Function, forwardFunc: Function }
     comps.push({
