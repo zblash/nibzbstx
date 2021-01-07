@@ -1,6 +1,7 @@
 /* eslint no-console:0 */
 import { difference } from "./utils";
-import _ from "lodash";
+import isEqual from "lodash.isequal";
+import isPlainObject from "lodash.isplainobject";
 const noFunc = () => {
   console.log(
     "There is no forward function instance! Before using the forward function you have to create a store"
@@ -40,13 +41,13 @@ export function store(initialState, forwards, generatedActions) {
     const oldState = state;
     forwardArr.forEach((reducer) => {
       const returnedState = reducer(state, action);
-      if (_.isPlainObject(returnedState)) {
+      if (isPlainObject(returnedState)) {
         state = Object.assign({}, returnedState);
       } else {
         throw new Error("You can only set the state with plain object");
       }
     });
-    if (!_.isEqual(state, oldState)) {
+    if (!isEqual(state, oldState)) {
       produceEffect(difference(state, oldState));
       sendNewStateToSubs();
     }
