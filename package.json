@@ -4,7 +4,9 @@
   "description": "Simple and reusable state management system with side effects",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "buildDev": "webpack --mode=development",
+    "build": "rimraf -r dist && webpack --mode=production",
+    "deploy": "yarn build && npm publish"
   },
   "repository": {
     "type": "git",
@@ -20,7 +22,19 @@
   },
   "homepage": "https://github.com/zblash/nibzbstx#readme",
   "devDependencies": {
-    "eslint": "^7.15.0"
+    "eslint": "^7.15.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "glob": "^7.1.6",
+    "path": "^0.12.7",
+    "prettier": "^2.1.2",
+    "rimraf": "^3.0.2",
+    "webpack": "^5.3.2",
+    "webpack-cli": "^4.1.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-env": "^1.7.0"
   },
   "dependencies": {
     "lodash": "^4.17.20"
