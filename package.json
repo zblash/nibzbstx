@@ -2,7 +2,7 @@
   "name": "nibzbstx",
   "version": "1.0.0",
   "description": "Simple and reusable state management system with side effects",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "buildDev": "webpack --mode=development",
     "build": "rimraf -r dist && webpack --mode=production",
