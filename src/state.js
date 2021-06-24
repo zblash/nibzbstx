@@ -1,11 +1,10 @@
-import { ActionHOC } from "./actions";
-import { forward } from "./store";
+import { ActionRegistry } from "./actions";
+import { CommonHelper } from "./utils";
 
-export function State(args) {
-  const actionHoc = ActionHOC();
-  const actions = args;
-  const initialState = actions.initial;
-  delete actions.initial;
+export function State(storeObj) {
+  const actionRegistry = ActionRegistry();
+  const actions = storeObj.actions;
+  const initialState = storeObj.state;
 
   const namedActions = {};
 
@@ -28,26 +27,17 @@ export function State(args) {
   Object.keys(actions).forEach((actionName) => {
     namedActions[actionName] = actions[actionName];
 
-    const actionCreator = (payload, ext = {}) => {
-      const meta = { ...ext };
-      delete meta.type;
-      delete meta.payload;
-      return {
+    const actionMethod = (payload) => {
+      return CommonHelper.functionForward({
         type: actionName,
         payload,
-        ...meta,
-      };
-    };
-
-    const actionMethod = (payload) => {
-      const action = actionCreator(payload);
-      return forward(action);
+      });
     };
 
     reducerWithActions[actionName] = actionMethod;
 
-    actionHoc.addAction(actionName, actionMethod, actionCreator);
+    actionRegistry.addAction(actionName, actionMethod);
   });
-  reducerWithActions.actions = actionHoc;
+  reducerWithActions.actions = actionRegistry.Actions;
   return reducerWithActions;
 }

@@ -7,7 +7,7 @@ export function generateStore(...reducerWithActions) {
   reducerWithActions.forEach((reducerWithAction) => {
     _initialState = Object.assign(_initialState, reducerWithAction.getState());
     forwards.push(reducerWithAction);
-    Object.assign(generatedActions, reducerWithAction.actions.Actions);
+    Object.assign(generatedActions, reducerWithAction.actions);
   });
   return store(_initialState, forwards, generatedActions);
 }

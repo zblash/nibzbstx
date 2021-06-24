@@ -22,54 +22,49 @@ npm install nibzbstx
 #### Chainable
 
 ```js
-import {getActionHOC} from "../helpers/nibzbstm/actions";
-import {State, generateStore, Actions} from "../helpers/nibzbstm/index";
+import { State, generateStore } from "nibzbstx";
 
 const makeBtnTrue = (state, payload) => {
-    return {...state,btn: true};
+  return { ...state, btn: true };
 };
 const makeBtnFalse = (state, payload) => {
-    return {...state,btn: false};
+  return { ...state, btn: false };
 };
 const makeBtn2True = (state, payload) => {
-    return {...state,btn2: true};
+  return { ...state, btn2: payload };
 };
 const makeBtn2False = (state, payload) => {
-    return {...state, btn2: false};
+  return { ...state, btn2: false };
 };
 const changeBtn3State = (state, payload) => {
-    return {...state, btn3: payload};
+  return { ...state, btn3: payload };
 };
-$(document).ready(() => {
-    const btnAction = State({
-        initial: {btn: false},
-        makeBtnTrue,
-        makeBtnFalse
-    });
-    const btnAction2 = State({
-        initial: {btn2: false},
-        makeBtn2True,
-        makeBtn2False
-    });
-    const btnAction3 = State({
-        initial: {btn3: false},
-        changeBtn3State
-    });
 
-    const store = generateStore(btnAction, btnAction2, btnAction3);
+const btnAction = State({
+  state: { btn: false },
+  actions: { makeBtnTrue: makeBtnTrue, makeBtnFalse: makeBtnFalse },
+});
+const btnAction2 = State({
+  state: { btn2: false },
+  actions: { makeBtn2True: makeBtn2True, makeBtn2False: makeBtn2False },
+});
+const btnAction3 = State({
+  state: { btn3: true },
+  actions: { changeBtn3State: changeBtn3State },
+});
 
-    store.manageEffects(function () {
-        console.log("changed");
-    }, ["btn","btn3"]);
+const store = generateStore(btnAction, btnAction2, btnAction3);
 
-    console.log(store.getState());
-    store.actions.makeBtnTrue();
-    console.log(store.getState());
-    store.actions.makeBtn2True();
-    console.log(store.getState());
-    store.actions.changeBtn3State(false);
-    console.log(store.getState());
+store.manageEffects(
+  function () {
+    console.log("changed");
+  },
+  ["btn", "btn3"]
+);
 
+console.log(store.getState());
+store.actions.makeBtn2True(true);
+console.log(store.getState());
 ```
 
 ## 🤝 Contributing

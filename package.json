@@ -1,6 +1,6 @@
 {
   "name": "nibzbstx",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple and reusable state management system with side effects",
   "main": "./dist/index.js",
   "scripts": {

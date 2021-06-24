@@ -1,7 +1,6 @@
-export function ActionHOC() {
+export function ActionRegistry() {
   const Actions = {};
-  const ActionCreators = {};
-  function addAction(actionName, action, actionCreator) {
+  function addAction(actionName, action) {
     if (typeof Actions[actionName] === "object") {
       throw new Error(`An action name cannot be object -> "${actionName}"!`);
     }
@@ -9,8 +8,7 @@ export function ActionHOC() {
       return true;
     }
     Actions[actionName] = (payload) => action(payload);
-    ActionCreators[actionName] = actionCreator;
   }
 
-  return { ActionCreators, Actions, addAction };
+  return { Actions, addAction };
 }
