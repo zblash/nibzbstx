@@ -9,7 +9,8 @@ export const CommonHelper = (function () {
     );
   };
 
-  let resForward = noFunc;
+  let syncForward = noFunc;
+  let asyncForward = noFunc;
 
   function getDifferencesInGivenObjects(object, base) {
     function changes(object, base) {
@@ -26,16 +27,25 @@ export const CommonHelper = (function () {
   }
 
   let functionForward = (...args) => {
-    return resForward(...args);
+    return syncForward(...args);
   };
 
-  function applyForwardFunction(forward) {
-    resForward = forward;
+  let asyncFunctionForward = (...args) => {
+    return asyncForward(...args);
+  };
+
+  function applyForwardFunction(forward, forwardType = "Sync") {
+    if (forwardType === "Async") {
+      asyncForward = forward;
+    } else {
+      syncForward = forward;
+    }
   }
 
   return {
     getDifferencesInGivenObjects,
     functionForward,
-    applyForwardFunction,
+    asyncFunctionForward,
+    applyForwardFunction
   };
 })();
