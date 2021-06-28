@@ -3,14 +3,20 @@ import { CommonHelper } from "./utils";
 
 export function State(storeObj) {
   const actionRegistry = ActionRegistry();
-  const actions = storeObj.actions;
+  const storeObjActions = storeObj.actions;
   const initialState = storeObj.state;
+  const storeObjAsyncActions = storeObj.asyncActions;
 
   const namedActions = {};
+  const namedAsyncActions = {};
 
   let currentState;
 
-  const reducerWithActions = (state, action = {}) => {
+  const getState = () => {
+    return initialState;
+  };
+
+  const syncForward = (state, action = {}) => {
     if (namedActions[action.type]) {
       currentState = namedActions[action.type](state, action.payload);
     } else {
@@ -19,25 +25,37 @@ export function State(storeObj) {
     return currentState;
   };
 
-  reducerWithActions.getState = () => {
-    return initialState;
-  };
-
-  reducerWithActions.forwardFuncs = {};
-  Object.keys(actions).forEach((actionName) => {
-    namedActions[actionName] = actions[actionName];
+  Object.keys(storeObjActions).forEach((actionName) => {
+    namedActions[actionName] = storeObjActions[actionName];
 
     const actionMethod = (payload) => {
       return CommonHelper.functionForward({
         type: actionName,
-        payload,
+        payload
       });
     };
 
-    reducerWithActions[actionName] = actionMethod;
-
     actionRegistry.addAction(actionName, actionMethod);
   });
-  reducerWithActions.actions = actionRegistry.Actions;
-  return reducerWithActions;
+
+  const asyncForward = ({ state, setAction }, action) => {
+    namedAsyncActions[action.type]({ state, setAction }, action.payload);
+  };
+
+  Object.keys(storeObjAsyncActions).forEach((actionName) => {
+    namedAsyncActions[actionName] = storeObjAsyncActions[actionName];
+    const actionMethod = (payload) => {
+      return CommonHelper.asyncFunctionForward({
+        type: actionName,
+        payload
+      });
+    };
+
+    actionRegistry.addAction(actionName, actionMethod, "Async");
+  });
+
+  const actions = actionRegistry.Actions;
+  const asyncActions = actionRegistry.AsyncActions;
+
+  return { getState, syncForward, asyncForward, actions, asyncActions };
 }
