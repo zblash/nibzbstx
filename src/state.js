@@ -25,35 +25,39 @@ export function State(storeObj) {
     return currentState;
   };
 
-  Object.keys(storeObjActions).forEach((actionName) => {
-    namedActions[actionName] = storeObjActions[actionName];
+  if (storeObjActions !== null || storeObjAsyncActions !== undefined) {
+    Object.keys(storeObjActions).forEach((actionName) => {
+      namedActions[actionName] = storeObjActions[actionName];
 
-    const actionMethod = (payload) => {
-      return CommonHelper.functionForward({
-        type: actionName,
-        payload
-      });
-    };
+      const actionMethod = (payload) => {
+        return CommonHelper.functionForward({
+          type: actionName,
+          payload
+        });
+      };
 
-    actionRegistry.addAction(actionName, actionMethod);
-  });
-
+      actionRegistry.addAction(actionName, actionMethod);
+    });
+  }
   const asyncForward = ({ state, setAction }, action) => {
-    namedAsyncActions[action.type]({ state, setAction }, action.payload);
+    if (typeof namedAsyncActions[action.type] === "function") {
+      namedAsyncActions[action.type]({ state, setAction }, action.payload);
+    }
   };
 
-  Object.keys(storeObjAsyncActions).forEach((actionName) => {
-    namedAsyncActions[actionName] = storeObjAsyncActions[actionName];
-    const actionMethod = (payload) => {
-      return CommonHelper.asyncFunctionForward({
-        type: actionName,
-        payload
-      });
-    };
+  if (storeObjAsyncActions !== null && storeObjAsyncActions !== undefined) {
+    Object.keys(storeObjAsyncActions).forEach((actionName) => {
+      namedAsyncActions[actionName] = storeObjAsyncActions[actionName];
+      const actionMethod = (payload) => {
+        return CommonHelper.asyncFunctionForward({
+          type: actionName,
+          payload
+        });
+      };
 
-    actionRegistry.addAction(actionName, actionMethod, "Async");
-  });
-
+      actionRegistry.addAction(actionName, actionMethod, "Async");
+    });
+  }
   const actions = actionRegistry.Actions;
   const asyncActions = actionRegistry.AsyncActions;
 
