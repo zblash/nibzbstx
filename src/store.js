@@ -2,22 +2,38 @@ import { CommonHelper } from "./utils";
 import isEqual from "lodash.isequal";
 import isPlainObject from "lodash.isplainobject";
 
-export function store(initialState, forwards, generatedActions) {
+export function store(
+  initialState,
+  forwards,
+  generatedActions,
+  asyncForwards,
+  generatedAsyncActions
+) {
   const actions = generatedActions;
+  const asyncActions = generatedAsyncActions;
 
   let state = initialState;
 
   const forwardArr = forwards;
+  const asyncForwardArr = asyncForwards;
 
   // {callbackFunc, depActionArr}
   const effects = [];
+
+  function getState() {
+    return state;
+  }
+
+  function setAction(actionName, payload) {
+    stateForward({ type: actionName, payload });
+  }
 
   function stateForward(action) {
     const oldState = state;
     forwardArr.forEach((reducer) => {
       const returnedState = reducer(state, action);
       if (isPlainObject(returnedState)) {
-        state = Object.assign({}, returnedState);
+        state = Object.assign({ ...state }, returnedState);
       } else {
         throw new Error("You can only set the state with plain object");
       }
@@ -27,11 +43,14 @@ export function store(initialState, forwards, generatedActions) {
     }
   }
 
-  CommonHelper.applyForwardFunction(stateForward);
-
-  function getState() {
-    return state;
+  function asyncForwardProducer(action) {
+    asyncForwardArr.forEach((asyncReducer) => {
+      asyncReducer({ state, setAction }, action);
+    });
   }
+
+  CommonHelper.applyForwardFunction(stateForward);
+  CommonHelper.applyForwardFunction(asyncForwardProducer, "Async");
 
   function produceEffect(dependency) {
     const changes = Object.keys(dependency);
@@ -46,5 +65,5 @@ export function store(initialState, forwards, generatedActions) {
     effects.push({ callbackFunc: callback, depActionArr: depActionArr });
   }
 
-  return { getState, actions, manageEffects };
+  return { getState, actions, manageEffects, asyncActions };
 }
