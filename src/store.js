@@ -56,7 +56,8 @@ export function store(
     const changes = Object.keys(dependency);
     effects.forEach((effect) => {
       if (effect.depActionArr.some((r) => changes.indexOf(r) > -1)) {
-        effect.callbackFunc();
+        const changedKeys = CommonHelper.getChangedKeys(state, changes);
+        effect.callbackFunc(changedKeys);
       }
     });
   }
