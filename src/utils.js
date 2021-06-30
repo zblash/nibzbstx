@@ -26,6 +26,15 @@ export const CommonHelper = (function () {
     return changes(object, base);
   }
 
+  function getChangedKeys(object, keys) {
+    return Object.keys(object)
+      .filter((key) => keys.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = object[key];
+        return obj;
+      }, {});
+  }
+
   let functionForward = (...args) => {
     return syncForward(...args);
   };
@@ -46,6 +55,7 @@ export const CommonHelper = (function () {
     getDifferencesInGivenObjects,
     functionForward,
     asyncFunctionForward,
-    applyForwardFunction
+    applyForwardFunction,
+    getChangedKeys
   };
 })();
