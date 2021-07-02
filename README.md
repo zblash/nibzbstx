@@ -22,7 +22,7 @@ npm install nibzbstx
 #### Chainable
 
 ```js
-import { State, generateStore } from "../src/index";
+import { State, StoreRegistry } from "../src/index";
 
 const btnAction = State({
   state: { btn: false },
@@ -54,19 +54,20 @@ const btnAction2 = State({
   }
 });
 
-const store = generateStore(btnAction, btnAction2);
+const store = StoreRegistry.register(btnAction2);
 
+const store2 = StoreRegistry.register(btnAction);
 store.manageEffects(
-  function () {
-    console.log("changed");
+  function (changed) {
+    console.log("changed states", changed);
   },
   ["btn", "btn2"]
 );
 
-console.log(store.getState());
+console.log("s", store.getState(), store2.getState());
 store.actions.makeBtn2True(true);
 console.log(store.getState());
-store.asyncActions.makeBtn2TrueAsync("s");
+store.asyncActions.makeBtn2TrueAsync();
 setTimeout(() => {
   console.log(store.getState());
 }, 1200);
