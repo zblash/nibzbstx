@@ -9,13 +9,13 @@ export function store(
   asyncForwards,
   generatedAsyncActions
 ) {
-  const actions = generatedActions;
-  const asyncActions = generatedAsyncActions;
+  let actions = generatedActions;
+  let asyncActions = generatedAsyncActions;
 
   let state = initialState;
 
-  const forwardArr = forwards;
-  const asyncForwardArr = asyncForwards;
+  let forwardArr = forwards;
+  let asyncForwardArr = asyncForwards;
 
   // {callbackFunc, depActionArr}
   const effects = [];
@@ -63,8 +63,26 @@ export function store(
   }
 
   function manageEffects(callback, depActionArr) {
-    effects.push({ callbackFunc: callback, depActionArr: depActionArr });
+    if (depActionArr.every((depAction) => typeof depAction === "string")) {
+      effects.push({ callbackFunc: callback, depActionArr: depActionArr });
+    } else {
+      throw new Error("You can only set dependency array with string");
+    }
   }
 
-  return { getState, actions, manageEffects, asyncActions };
+  function registerState(
+    rInitialState,
+    rForwards,
+    rGeneratedActions,
+    rAsyncForwards,
+    rGeneratedAsyncActions
+  ) {
+    state = { ...state, ...rInitialState };
+    forwardArr = forwardArr.concat(rForwards);
+    actions = { ...actions, ...rGeneratedActions };
+    asyncForwardArr = asyncForwardArr.concat(rAsyncForwards);
+    asyncActions = { ...asyncActions, rGeneratedAsyncActions };
+  }
+
+  return { getState, actions, manageEffects, asyncActions, registerState };
 }
