@@ -1,4 +1,4 @@
 import { State } from "./state";
-import { generateStore } from "./generateStore";
+import { StoreRegistry } from "./generateStore";
 
-export { State, generateStore };
+export { State, StoreRegistry };
